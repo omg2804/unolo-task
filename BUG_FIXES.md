@@ -85,9 +85,12 @@ Incorrect status code was used for invalid input.
 Changed response code from:
 ```js
 res.status(200)
+```
 
 to:
+```js
 res.status(400)
+```
 
 **Why This Fix Is Correct:**
 HTTP 400 correctly represents a client-side validation error.
