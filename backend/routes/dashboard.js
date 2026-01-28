@@ -73,13 +73,22 @@ router.get('/employee', authenticateToken, async (req, res) => {
         );
 
         // Get this week's stats
+        // const [weekStats] = await pool.execute(
+        //     `SELECT COUNT(*) as total_checkins,
+        //             COUNT(DISTINCT client_id) as unique_clients
+        //      FROM checkins
+        //      WHERE employee_id = ? AND checkin_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)`,
+        //     [req.user.id]
+        // );
+
         const [weekStats] = await pool.execute(
-            `SELECT COUNT(*) as total_checkins,
-                    COUNT(DISTINCT client_id) as unique_clients
-             FROM checkins
-             WHERE employee_id = ? AND checkin_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)`,
-            [req.user.id]
-        );
+    `SELECT COUNT(*) as total_checkins,
+            COUNT(DISTINCT client_id) as unique_clients
+     FROM checkins
+     WHERE employee_id = ?
+       AND checkin_time >= datetime('now', '-7 days')`,
+    [req.user.id]
+);
 
         res.json({
             success: true,
