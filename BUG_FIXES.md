@@ -13,3 +13,7 @@ Cause: checkins state initialized as null
 Fix: Initialize state as empty array [] and add safe reduce
 
 Fixed check-in API returning 200 for missing client_id → now 400
+
+Bug: Dashboard does not update correctly when user changes and sometimes shows stale data
+Cause: useEffect had empty dependency array while using user, and role detection was based on id === 1
+Fix: Added user as dependency, reset loading state before refetch, and used user.role instead of hardcoded ID

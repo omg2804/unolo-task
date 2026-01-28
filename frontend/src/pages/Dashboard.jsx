@@ -7,12 +7,17 @@ function Dashboard({ user }) {
     const [error, setError] = useState('');
 
     useEffect(() => {
+    if (user) {
+        setLoading(true);
         fetchDashboardData();
-    }, []);
+    }
+}, [user]);
+
 
     const fetchDashboardData = async () => {
         try {
-            const endpoint = user.id === 1 ? '/dashboard/stats' : '/dashboard/employee';
+            const endpoint = user.role === 'manager' ? '/dashboard/stats' : '/dashboard/employee';
+
             const response = await api.get(endpoint);
             
             if (response.data.success) {
