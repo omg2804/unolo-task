@@ -42,7 +42,7 @@ router.post('/', authenticateToken, async (req, res) => {
 
         // Check for existing active check-in
         const [activeCheckins] = await pool.execute(
-            'SELECT * FROM checkins WHERE employee_id = ? AND status = "checked_in"',
+            "SELECT * FROM checkins WHERE employee_id = ? AND status = 'checked_in'",
             [req.user.id]
         );
 
@@ -54,7 +54,7 @@ router.post('/', authenticateToken, async (req, res) => {
         }
 
         const [result] = await pool.execute(
-            `INSERT INTO checkins (employee_id, client_id, lat, lng, notes, status)
+            `INSERT INTO checkins (employee_id, client_id, latitude, longitude, notes, status)
              VALUES (?, ?, ?, ?, ?, 'checked_in')`,
             [req.user.id, client_id, latitude, longitude, notes || null]
         );
@@ -84,10 +84,18 @@ router.put('/checkout', authenticateToken, async (req, res) => {
             return res.status(404).json({ success: false, message: 'No active check-in found' });
         }
 
+        // await pool.execute(
+        //     'UPDATE checkins SET checkout_time = NOW(), status = "checked_out" WHERE id = ?',
+        //     [activeCheckins[0].id]
+        // );
+
         await pool.execute(
-            'UPDATE checkins SET checkout_time = NOW(), status = "checked_out" WHERE id = ?',
-            [activeCheckins[0].id]
-        );
+    `UPDATE checkins 
+     SET checkout_time = datetime('now'), status = 'checked_out' 
+     WHERE id = ?`,
+    [activeCheckins[0].id]
+);
+
 
         res.json({ success: true, message: 'Checked out successfully' });
     } catch (error) {
