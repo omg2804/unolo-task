@@ -69,11 +69,14 @@ function CheckIn({ user }) {
             });
 
             if (response.data.success) {
-                setSuccess('Checked in successfully!');
-                setSelectedClient('');
-                setNotes('');
-                fetchData(); // Refresh data
-            } else {
+    setSuccess(
+        `Checked in successfully! Distance from client: ${response.data.data.distance_from_client} km`
+    );
+    setSelectedClient('');
+    setNotes('');
+    fetchData();
+}
+ else {
                 setError(response.data.message);
             }
         } catch (err) {
@@ -149,6 +152,21 @@ function CheckIn({ user }) {
                     </p>
                     <p className="text-sm text-blue-600 mt-1">
                         Since: {new Date(activeCheckin.checkin_time).toLocaleString()}
+                        {activeCheckin.distance_from_client !== null && (
+    <p className="text-sm mt-2">
+        📍 Distance from client: 
+        <span className="font-semibold ml-1">
+            {activeCheckin.distance_from_client.toFixed(2)} km
+        </span>
+    </p>
+)}
+
+{activeCheckin.distance_from_client > 0.5 && (
+    <p className="text-sm mt-2 text-red-600 font-semibold">
+        ⚠️ You are far from the client location
+    </p>
+)}
+
                     </p>
                     <button
                         onClick={handleCheckOut}

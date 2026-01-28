@@ -1,6 +1,8 @@
 const express = require('express');
 const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const { calculateDistance } = require('../utils/distance');
+
 
 const router = express.Router();
 
@@ -53,19 +55,43 @@ router.post('/', authenticateToken, async (req, res) => {
             });
         }
 
-        const [result] = await pool.execute(
-            `INSERT INTO checkins (employee_id, client_id, latitude, longitude, notes, status)
-             VALUES (?, ?, ?, ?, ?, 'checked_in')`,
-            [req.user.id, client_id, latitude, longitude, notes || null]
-        );
+        const [clients] = await pool.execute(
+    'SELECT latitude, longitude FROM clients WHERE id = ?',
+    [client_id]
+);
+
+if (clients.length === 0) {
+    return res.status(404).json({ success: false, message: 'Client not found' });
+}
+
+const clientLat = parseFloat(clients[0].latitude);
+const clientLng = parseFloat(clients[0].longitude);
+
+const distance = calculateDistance(
+    parseFloat(latitude),
+    parseFloat(longitude),
+    clientLat,
+    clientLng
+);
+
+
+       const [result] = await pool.execute(
+    `INSERT INTO checkins 
+     (employee_id, client_id, latitude, longitude, distance_from_client, notes, status)
+     VALUES (?, ?, ?, ?, ?, ?, 'checked_in')`,
+    [req.user.id, client_id, latitude, longitude, distance, notes || null]
+);
+
 
         res.status(201).json({
-            success: true,
-            data: {
-                id: result.insertId,
-                message: 'Checked in successfully'
-            }
-        });
+    success: true,
+    data: {
+        id: result.insertId,
+        distance_from_client: distance,
+        message: 'Checked in successfully'
+    }
+});
+
     } catch (error) {
         console.error('Check-in error:', error);
         res.status(500).json({ success: false, message: 'Check-in failed' });
@@ -156,5 +182,7 @@ router.get('/active', authenticateToken, async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to fetch active check-in' });
     }
 });
+
+
 
 module.exports = router;
