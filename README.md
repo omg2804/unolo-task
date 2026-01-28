@@ -93,11 +93,7 @@ Frontend runs on: `http://localhost:5173`
 
 ---
 
-## ✅ 3️⃣ Add Architecture Decision Section
 
-Add this near the bottom:
-
-```md
 ## Architecture Decisions
 
 - SQLite is used for simplicity and zero-config setup.
