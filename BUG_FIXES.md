@@ -11,3 +11,5 @@ Fix: Updated queries to use correct column names and SQLite-compatible syntax
 Bug: History page crashes due to calling .reduce() on null
 Cause: checkins state initialized as null
 Fix: Initialize state as empty array [] and add safe reduce
+
+Fixed check-in API returning 200 for missing client_id → now 400
